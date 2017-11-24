@@ -2,19 +2,23 @@
 #define _FUNC_H_
 
 #include <openvdb/openvdb.h>
-#include <vector>
-using namespace std;
-using namespace openvdb;
+#include <string>
+/* #include <vector> */
 
-void useoffset(FloatGrid::Ptr, float, int);
+/* using namespace std; */
+/* using namespace openvdb; */
+class Func{
+ public:
+  void useoffset(openvdb::FloatGrid::Ptr, float, int);
 
-void computeoffset(FloatGrid::Ptr, float, int);
+  void computeoffset(openvdb::FloatGrid::Ptr, float, int);
 
-void test(FloatGrid::Ptr, int);
+  void test(openvdb::FloatGrid::Ptr, int);
 
-void create(FloatGrid::Ptr, const CoordBBox&, float, int);
+  void create(openvdb::FloatGrid::Ptr, const openvdb::CoordBBox&, float, int);
 
-void createOFFFile(string, vector<Vec3s>, vector<Vec4I>);
+  void createOFFFile(std::string, std::vector<openvdb::Vec3s>, std::vector<openvdb::Vec4I>);
+};
 
 
 #endif

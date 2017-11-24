@@ -18,7 +18,7 @@ using namespace openvdb;
 openvdb::util::CpuTimer t;
 using openvdb::tools::LevelSetFilter;
 
-void computeoffset(FloatGrid::Ptr grid, float offset, int n){
+void Func::computeoffset(FloatGrid::Ptr grid, float offset, int n){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
@@ -54,7 +54,7 @@ void computeoffset(FloatGrid::Ptr grid, float offset, int n){
 }
 
 
-void useoffset(FloatGrid::Ptr grid, float offset, int n){
+void Func::useoffset(FloatGrid::Ptr grid, float offset, int n){
   //use OpenVDB's offset() function
   vector<Vec3s> points;
   vector<Vec4I> quads;
@@ -83,7 +83,7 @@ void useoffset(FloatGrid::Ptr grid, float offset, int n){
     createOFFFile("box_useoffset.off", points, quads);
 }
 
-void test(FloatGrid::Ptr grid, int n){
+void Func::test(FloatGrid::Ptr grid, int n){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   t.start();
@@ -96,7 +96,7 @@ void test(FloatGrid::Ptr grid, int n){
 }
 
 
-void create(FloatGrid::Ptr grid, const CoordBBox& indexBB, float h, int n){
+void Func::create(FloatGrid::Ptr grid, const CoordBBox& indexBB, float h, int n){
   typename FloatGrid::Accessor accessor = grid->getAccessor();
   
   for (Int32 i = indexBB.min().x(); i <= indexBB.max().x(); ++i) {
@@ -108,11 +108,13 @@ void create(FloatGrid::Ptr grid, const CoordBBox& indexBB, float h, int n){
 
 	// compute level set function value
 	// note the convention: negative inside / positive outside
+
+	float distance;
 	if(n == 0) //mechanical
-	  float distance = -eval(p.x(), p.y(), p.z());
+	  distance = -eval(p.x(), p.y(), p.z());
 	else if(n == 1){ //box
 	  boxes_3d_is box;
-	  float distance = -box.eval(p.x(), p.y(), p.z());
+	  distance = -box.eval(p.x(), p.y(), p.z());
 	}
 	// set the value in the grid
 	accessor.setValue(Coord(i,j,k), distance);
@@ -126,7 +128,7 @@ void create(FloatGrid::Ptr grid, const CoordBBox& indexBB, float h, int n){
 }
 
 
-void createOFFFile(string out_file_name, vector<Vec3s> points, vector<Vec4I> quads){
+void Func::createOFFFile(string out_file_name, vector<Vec3s> points, vector<Vec4I> quads){
   int i;
   ofstream f(out_file_name);
   f << "OFF" << endl;

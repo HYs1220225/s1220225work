@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "func.h"
 #include <openvdb/openvdb.h>
 // #include <openvdb/tools/SignedFloodFill.h>
 // #include <openvdb/tools/VolumeToMesh.h>
@@ -8,8 +9,7 @@
 // #include <openvdb/tools/LevelSetFilter.h>
 #include <openvdb/util/CpuTimer.h>
 // #include <vector>
-#include "func.h"
-// #include "mechanical.h"
+//#include "mechanical.h"
 
 using namespace std;
 using namespace openvdb;
@@ -18,6 +18,7 @@ openvdb::util::CpuTimer t;
 
 int main(){
   int n = 0;
+  Func f;
   openvdb::initialize();
 
   float backgroundValue = 1000.0f;
@@ -29,16 +30,16 @@ int main(){
   
   openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create(backgroundValue);
   CoordBBox indexBB(Coord(-70,-80,-20), Coord(300,80,70));
-  create(grid, indexBB, 0.1f, n);
+  f.create(grid, indexBB, 0.1f, n);
   
   t.stop();
   
   //  save 0 level set object -> .off
-  test(grid, n);
+  //  f.test(grid, n);
   
   
-  //  computeoffset(grid, offset, n);
-  //  useoffset(grid, offset);
+    f.computeoffset(grid, offset, n);
+  //  f.useoffset(grid, offset);
   
   return 0;
 }
