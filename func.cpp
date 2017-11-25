@@ -15,7 +15,7 @@
 using namespace std;
 using namespace openvdb;
 
-openvdb::util::CpuTimer t;
+openvdb::util::CpuTimer T;
 using openvdb::tools::LevelSetFilter;
 
 void Func::computeoffset(FloatGrid::Ptr grid, float offset, int n){
@@ -24,27 +24,27 @@ void Func::computeoffset(FloatGrid::Ptr grid, float offset, int n){
   
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
-  t.start();
+  T.start();
   
   openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
   
-  t.stop();
+  T.stop();
 
   
-  t.start();
+  T.start();
   
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
     iter.setValue(dist + offset);
   }
   
-  t.stop();
+  T.stop();
   
-  t.start();
+  T.start();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
 
-  t.stop();
+  T.stop();
   
   /* save to off file */
   if(n == 0)
@@ -63,18 +63,18 @@ void Func::useoffset(FloatGrid::Ptr grid, float offset, int n){
 
   openvdb::FloatGrid::Ptr grid_offset = grid;  
   
-  t.start();
+  T.start();
   openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
   use.offset(offset);
   
-  t.stop();
+  T.stop();
 
   
-  t.start();
+  T.start();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
   
-  t.stop();
+  T.stop();
 
   // save to off file
   if(n == 0)
@@ -86,9 +86,9 @@ void Func::useoffset(FloatGrid::Ptr grid, float offset, int n){
 void Func::test(FloatGrid::Ptr grid, int n){
   vector<Vec3s> points;
   vector<Vec4I> quads;
-  t.start();
+  T.start();
   openvdb::tools::volumeToMesh(*grid, points, quads , 0.0);
-  t.stop();
+  T.stop();
   if(n == 0)
     createOFFFile("mechanical.off", points, quads);
   else if(n == 1)
