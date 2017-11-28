@@ -7,10 +7,10 @@
 #include <openvdb/tools/LevelSetRebuild.h>
 #include <openvdb/tools/LevelSetFilter.h>
 #include <openvdb/util/CpuTimer.h>
-#include <vector>
+// #include <vector>
 #include "func.h"
-#include "mechanical.h"
-#include "boxes.h"
+// #include "mechanical.h"
+// #include "boxes.h"
 
 using namespace std;
 using namespace openvdb;
@@ -18,7 +18,7 @@ using namespace openvdb;
 openvdb::util::CpuTimer T;
 using openvdb::tools::LevelSetFilter;
 
-void Func::computeoffset(FloatGrid::Ptr grid, float offset, int n){
+void Func::computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
@@ -47,14 +47,11 @@ void Func::computeoffset(FloatGrid::Ptr grid, float offset, int n){
   T.stop();
   
   /* save to off file */
-  if(n == 0)
-    createOFFFile("mechanical_computeoffset.off", points, quads);
-  else if(n == 1)
-    createOFFFile("box_computeoffset.off", points, quads);
+  createOFFFile(model + "_computeoffset.off", points, quads);
 }
 
 
-void Func::useoffset(FloatGrid::Ptr grid, float offset, int n){
+void Func::useoffset(FloatGrid::Ptr grid, float offset, std::string model){
   //use OpenVDB's offset() function
   vector<Vec3s> points;
   vector<Vec4I> quads;
@@ -77,58 +74,22 @@ void Func::useoffset(FloatGrid::Ptr grid, float offset, int n){
   T.stop();
 
   // save to off file
-  if(n == 0)
-    createOFFFile("mechanical_useoffset.off", points, quads);
-  else if(n == 1)
-    createOFFFile("box_useoffset.off", points, quads);
+  createOFFFile(model + "_useoffset.off", points, quads);
 }
 
-void Func::test(FloatGrid::Ptr grid, int n){
+void Func::test(FloatGrid::Ptr grid, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   T.start();
   openvdb::tools::volumeToMesh(*grid, points, quads , 0.0);
   T.stop();
-  if(n == 0)
-    createOFFFile("mechanical.off", points, quads);
-  else if(n == 1)
-    createOFFFile("box.off", points, quads);
-}
-
-
-void Func::create(FloatGrid::Ptr grid, const CoordBBox& indexBB, float h, int n){
-  typename FloatGrid::Accessor accessor = grid->getAccessor();
-  
-  for (Int32 i = indexBB.min().x(); i <= indexBB.max().x(); ++i) {
-    for (Int32 j = indexBB.min().y(); j <= indexBB.max().y(); ++j) {
-      for (Int32 k = indexBB.min().z(); k <= indexBB.max().z(); ++k) {
-	// transform point (i,j,k) of index space into world space
-	// assume that hx=hy=hz=h (each cell is a cube)
-	Vec3f p(i*h, j*h, k*h);
-
-	// compute level set function value
-	// note the convention: negative inside / positive outside
-
-	float distance;
-	if(n == 0) //mechanical
-	  distance = -eval(p.x(), p.y(), p.z());
-	else if(n == 1){ //box
-	  boxes_3d_is box;
-	  distance = -box.eval(p.x(), p.y(), p.z());
-	}
-	// set the value in the grid
-	accessor.setValue(Coord(i,j,k), distance);
-      }
-    }
-  }
-
-  // In order to use the grid further, we need to associate a scaling transform
-  // to this grid from voxel in index space to voxel in world space
-  grid->setTransform(openvdb::math::Transform::createLinearTransform(h));
+  // cout << "run test function" << endl;
+  createOFFFile(model + ".off", points, quads);
 }
 
 
 void Func::createOFFFile(string out_file_name, vector<Vec3s> points, vector<Vec4I> quads){
+  // cout << "run createOFFFile function" << endl;
   int i;
   ofstream f(out_file_name);
   f << "OFF" << endl;

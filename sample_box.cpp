@@ -8,7 +8,8 @@
 // #include <openvdb/tools/LevelSetFilter.h>
 #include <openvdb/util/CpuTimer.h>
 // #include <vector>
-#include "func.h"
+// #include "func.h"
+#include "Fbox.h"
 // #include "boxes.h"
 
 using namespace std;
@@ -17,7 +18,8 @@ using namespace openvdb;
 openvdb::util::CpuTimer t;
 
 int main(){
-  int n = 1;
+  string model("box");
+  Fbox f;
   openvdb::initialize();
 
   float backgroundValue = 1000.0f;
@@ -29,16 +31,16 @@ int main(){
   
   openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create(backgroundValue);
   CoordBBox indexBB(Coord(-20,-20,-20), Coord(140,60,60)); /*box*/
-  create(grid, indexBB, 0.025f/*box*/, n);
+  f.create(grid, indexBB, 0.025f/*box*/);
   
   t.stop();
   
   //  save 0 level set object -> .off
-  test(grid, n);
+  f.test(grid, model);
 
   
-  //  computeoffset(grid, offset);
-  //  useoffset(grid, offset);
+  //  f.computeoffset(grid, offset, model);
+  //  f.useoffset(grid, offset, model);
   
   return 0;
 }

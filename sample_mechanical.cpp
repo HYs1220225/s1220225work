@@ -7,7 +7,8 @@
 // #include <openvdb/tools/LevelSetRebuild.h>
 // #include <openvdb/tools/LevelSetFilter.h>
 #include <openvdb/util/CpuTimer.h>
-#include "func.h"
+//#include "func.h"
+#include "Fmechanical.h"
 // #include <vector>
 //#include "mechanical.h"
 
@@ -17,8 +18,8 @@ using namespace openvdb;
 openvdb::util::CpuTimer t;
 
 int main(){
-  int n = 0;
-  Func f;
+  string model("mechanical");
+  Fmecha f;
   openvdb::initialize();
 
   float backgroundValue = 1000.0f;
@@ -30,16 +31,16 @@ int main(){
   
   openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create(backgroundValue);
   CoordBBox indexBB(Coord(-70,-80,-20), Coord(300,80,70));
-  f.create(grid, indexBB, 0.1f, n);
+  f.create(grid, indexBB, 0.1f);
   
   t.stop();
   
   //  save 0 level set object -> .off
-  //  f.test(grid, n);
+  f.test(grid, model);
   
   
-    f.computeoffset(grid, offset, n);
-  //  f.useoffset(grid, offset);
+  //  f.computeoffset(grid, offset, model);
+  //  f.useoffset(grid, offset, model);
   
   return 0;
 }
