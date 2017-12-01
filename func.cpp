@@ -104,3 +104,88 @@ void Func::createOFFFile(string out_file_name, vector<Vec3s> points, vector<Vec4
   f << endl;
   f.close();
 }
+
+void Func::Rounding(FloatGrid::Ptr grid, float offset, std::string model){
+  //use OpenVDB's offset() function
+  vector<Vec3s> points;
+  vector<Vec4I> quads;
+  
+  grid->setGridClass(openvdb::GRID_LEVEL_SET);
+
+  openvdb::FloatGrid::Ptr grid_offset = grid;  
+  
+  T.start();
+  openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
+  use.offset(offset);
+  use.offset((-1)*offset);
+  
+  T.stop();
+
+  
+  T.start();
+  
+  openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
+  
+  T.stop();
+
+  // save to off file
+  createOFFFile(model + "_Rounding.off", points, quads);
+}
+
+void Func::Filleting(FloatGrid::Ptr grid, float offset, std::string model){
+  //use OpenVDB's offset() function
+  vector<Vec3s> points;
+  vector<Vec4I> quads;
+  
+  grid->setGridClass(openvdb::GRID_LEVEL_SET);
+
+  openvdb::FloatGrid::Ptr grid_offset = grid;  
+  
+  T.start();
+  openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
+  use.offset((-1)*offset);
+  use.offset(offset);
+  
+  T.stop();
+
+  
+  T.start();
+  
+  openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
+  
+  T.stop();
+
+  // save to off file
+  createOFFFile(model + "_Filleting.off", points, quads);
+}
+
+void Func::Smoothing(FloatGrid::Ptr grid, float offset, std::string model){
+  //use OpenVDB's offset() function
+  vector<Vec3s> points;
+  vector<Vec4I> quads;
+  
+  grid->setGridClass(openvdb::GRID_LEVEL_SET);
+
+  openvdb::FloatGrid::Ptr grid_offset = grid;  
+  
+  T.start();
+  openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
+  //rounding
+  use.offset(offset);
+  use.offset((-1)*offset);
+
+  //filleting
+  use.offset((-1)*offset);
+  use.offset(offset);
+  T.stop();
+
+  
+  T.start();
+  
+  openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
+  
+  T.stop();
+
+  // save to off file
+  createOFFFile(model + "_Smoothing.off", points, quads);
+}

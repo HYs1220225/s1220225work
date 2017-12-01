@@ -41,6 +41,9 @@ int main(){
   
   //  f.computeoffset(grid, offset, model);
   //  f.useoffset(grid, offset, model);
+  //  f.Rounding(grid, offset, model);
+  //  f.Filleting(grid, offset, model);
+  f.Smoothing(grid, offset, model);
   
   return 0;
 }
