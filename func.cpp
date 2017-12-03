@@ -105,61 +105,120 @@ void Func::createOFFFile(string out_file_name, vector<Vec3s> points, vector<Vec4
   f.close();
 }
 
-void Func::Rounding(FloatGrid::Ptr grid, float offset, std::string model){
-  //use OpenVDB's offset() function
+
+void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
-  grid->setGridClass(openvdb::GRID_LEVEL_SET);
-
-  openvdb::FloatGrid::Ptr grid_offset = grid;  
+  openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
-  openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
-  use.offset(offset);
-  use.offset((-1)*offset);
+  
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
   
   T.stop();
 
+  
+  T.start();
+  
+  for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
+    float dist = iter.getValue();
+    iter.setValue(dist - offset);
+  }  
+  for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
+    float dist = iter.getValue();
+    iter.setValue(dist + offset);
+  }
+  
+  T.stop();
   
   T.start();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
-  
-  T.stop();
 
-  // save to off file
-  createOFFFile(model + "_Rounding.off", points, quads);
+  T.stop();
+  
+  /* save to off file */
+  createOFFFile(model + "_Rounding_computeoffset.off", points, quads);
 }
 
-void Func::Filleting(FloatGrid::Ptr grid, float offset, std::string model){
-  //use OpenVDB's offset() function
+void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
-  grid->setGridClass(openvdb::GRID_LEVEL_SET);
-
-  openvdb::FloatGrid::Ptr grid_offset = grid;  
+  openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
-  openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
-  use.offset((-1)*offset);
-  use.offset(offset);
+  
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
   
   T.stop();
 
+  
+  T.start();
+  
+  for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
+    float dist = iter.getValue();
+    iter.setValue(dist + offset);
+  }  
+  for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
+    float dist = iter.getValue();
+    iter.setValue(dist - offset);
+  }
+  
+  T.stop();
   
   T.start();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
-  
-  T.stop();
 
-  // save to off file
-  createOFFFile(model + "_Filleting.off", points, quads);
+  T.stop();
+  
+  /* save to off file */
+  createOFFFile(model + "_Filleting_computeoffset.off", points, quads);
 }
 
-void Func::Smoothing(FloatGrid::Ptr grid, float offset, std::string model){
+void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
+  vector<Vec3s> points;
+  vector<Vec4I> quads;
+  
+  openvdb::FloatGrid::Ptr grid_dist = grid;
+  
+  T.start();
+  
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
+  
+  T.stop();
+
+  
+  T.start();
+  
+  for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
+    float dist = iter.getValue();
+    iter.setValue(dist - offset);
+  }  
+  for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
+    float dist = iter.getValue();
+    iter.setValue(dist + (2*offset));
+  }  
+  for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
+    float dist = iter.getValue();
+    iter.setValue(dist - offset);
+  }
+  
+  T.stop();
+  
+  T.start();
+  
+  openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
+
+  T.stop();
+  
+  /* save to off file */
+  createOFFFile(model + "_Smoothing_computeoffset_test.off", points, quads);
+}
+
+void Func::Rounding_useoffset(FloatGrid::Ptr grid, float offset, std::string model){
   //use OpenVDB's offset() function
   vector<Vec3s> points;
   vector<Vec4I> quads;
@@ -170,13 +229,9 @@ void Func::Smoothing(FloatGrid::Ptr grid, float offset, std::string model){
   
   T.start();
   openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
-  //rounding
-  use.offset(offset);
-  use.offset((-1)*offset);
-
-  //filleting
   use.offset((-1)*offset);
   use.offset(offset);
+  
   T.stop();
 
   
@@ -187,5 +242,60 @@ void Func::Smoothing(FloatGrid::Ptr grid, float offset, std::string model){
   T.stop();
 
   // save to off file
-  createOFFFile(model + "_Smoothing.off", points, quads);
+  createOFFFile(model + "_Rounding_useoffset.off", points, quads);
+}
+
+void Func::Filleting_useoffset(FloatGrid::Ptr grid, float offset, std::string model){
+  //use OpenVDB's offset() function
+  vector<Vec3s> points;
+  vector<Vec4I> quads;
+  
+  grid->setGridClass(openvdb::GRID_LEVEL_SET);
+
+  openvdb::FloatGrid::Ptr grid_offset = grid;  
+  
+  T.start();
+  openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
+  use.offset(offset);
+  use.offset((-1)*offset);
+  
+  T.stop();
+
+  
+  T.start();
+  
+  openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
+  
+  T.stop();
+
+  // save to off file
+  createOFFFile(model + "_Filleting_useoffset.off", points, quads);
+}
+
+void Func::Smoothing_useoffset(FloatGrid::Ptr grid, float offset, std::string model){
+  //use OpenVDB's offset() function
+  vector<Vec3s> points;
+  vector<Vec4I> quads;
+  
+  grid->setGridClass(openvdb::GRID_LEVEL_SET);
+
+  openvdb::FloatGrid::Ptr grid_offset = grid;  
+  
+  T.start();
+  openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
+  //rounding and filleting
+  use.offset((-1)*offset);
+  use.offset(2*offset);
+  use.offset((-1)*offset);
+  T.stop();
+
+  
+  T.start();
+  
+  openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
+  
+  T.stop();
+
+  // save to off file
+  createOFFFile(model + "_Smoothing_useoffset.off", points, quads);
 }

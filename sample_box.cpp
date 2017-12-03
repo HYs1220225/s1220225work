@@ -23,27 +23,30 @@ int main(){
   openvdb::initialize();
 
   float backgroundValue = 1000.0f;
-  float offset = -0.025; /*box*/
+  float offset = -0.05; // -0.025 -> -0.05
   
   // Create an empty floating-point grid
   
   t.start();
   
   openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create(backgroundValue);
-  CoordBBox indexBB(Coord(-20,-20,-20), Coord(140,60,60)); /*box*/
-  f.create(grid, indexBB, 0.025f/*box*/);
+  CoordBBox indexBB(Coord(-20,-20,-20), Coord(140,60,60));
+  f.create(grid, indexBB, 0.025f);
   
   t.stop();
   
   //  save 0 level set object -> .off
-  f.test(grid, model);
+  //  f.test(grid, model);
 
   
   //  f.computeoffset(grid, offset, model);
   //  f.useoffset(grid, offset, model);
-  //  f.Rounding(grid, offset, model);
-  //  f.Filleting(grid, offset, model);
-  f.Smoothing(grid, offset, model);
+  f.Rounding_computeoffset(grid, offset, model);
+  //  f.Filleting_computeoffset(grid, offset, model);
+  //  f.Smoothing_computeoffset(grid, offset, model);
+  //  f.Rounding_useoffset(grid, offset, model);
+  //  f.Filleting_useoffset(grid, offset, model);
+  //  f.Smoothing_useoffset(grid, offset, model);
   
   return 0;
 }

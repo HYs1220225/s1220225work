@@ -23,7 +23,7 @@ int main(){
   openvdb::initialize();
 
   float backgroundValue = 1000.0f;
-  float offset = -0.15;
+  float offset = -0.90; // -0.15 -> -0.30
   
   // Create an empty floating-point grid
   
@@ -41,9 +41,12 @@ int main(){
   
   //  f.computeoffset(grid, offset, model);
   //  f.useoffset(grid, offset, model);
-  //  f.Rounding(grid, offset, model);
-  //  f.Filleting(grid, offset, model);
-  f.Smoothing(grid, offset, model);
+  //  f.Rounding_computeoffset(grid, offset, model);
+  //  f.Filleting_computeoffset(grid, offset, model);
+  f.Smoothing_computeoffset(grid, offset, model);
+  //  f.Rounding_useoffset(grid, offset, model);
+  //  f.Filleting_useoffset(grid, offset, model);
+  //  f.Smoothing_useoffset(grid, offset, model);
   
   
   return 0;
