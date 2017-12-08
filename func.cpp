@@ -77,7 +77,7 @@ void Func::useoffset(FloatGrid::Ptr grid, float offset, std::string model){
   createOFFFile(model + "_useoffset.off", points, quads);
 }
 
-void Func::test(FloatGrid::Ptr grid, std::string model){
+void Func::original(FloatGrid::Ptr grid, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   T.start();
@@ -215,7 +215,7 @@ void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, std::strin
   T.stop();
   
   /* save to off file */
-  createOFFFile(model + "_Smoothing_computeoffset_test.off", points, quads);
+  createOFFFile(model + "_Smoothing_computeoffset.off", points, quads);
 }
 
 void Func::Rounding_useoffset(FloatGrid::Ptr grid, float offset, std::string model){

@@ -13,7 +13,7 @@ class Func{
 
   void computeoffset(openvdb::FloatGrid::Ptr, float, std::string);
 
-  void test(openvdb::FloatGrid::Ptr, std::string);
+  void original(openvdb::FloatGrid::Ptr, std::string);
 
   virtual void create(openvdb::FloatGrid::Ptr, const openvdb::CoordBBox&, float) = 0;
 
