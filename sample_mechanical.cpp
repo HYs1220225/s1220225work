@@ -11,9 +11,12 @@
 #include "Fmechanical.h"
 // #include <vector>
 //#include "mechanical.h"
+#include "tbb/task_scheduler_init.h"
+#include "tbb/tick_count.h"
 
 using namespace std;
 using namespace openvdb;
+using namespace tbb;
 
 openvdb::util::CpuTimer t;
 
@@ -23,18 +26,22 @@ int main(){
   Fmecha f;
   openvdb::initialize();
 
-  float backgroundValue = 1000.0f; // 1000.0f ->
+  float backgroundValue = 1000.0f; // 1000.0f
   float offset = -0.3; // -0.15 -> -0.30
   
   // Create an empty floating-point grid
   
   t.start();
+  tick_count t0 = tick_count::now();
   
   openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create(backgroundValue);
   CoordBBox indexBB(Coord(-70,-80,-20), Coord(300,80,70));
-  f.create(grid, indexBB, 0.1f); //0.1f ->0.15f
+  f.create(grid, indexBB, 0.1f);
   
+  tick_count t1 = tick_count::now();
   t.stop();
+  cout << "time for action = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
+  
   
   //  save 0 level set object -> .off
 

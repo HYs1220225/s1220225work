@@ -11,9 +11,12 @@
 // #include "func.h"
 #include "Fbox.h"
 // #include "boxes.h"
+#include "tbb/task_scheduler_init.h"
+#include "tbb/tick_count.h"
 
 using namespace std;
 using namespace openvdb;
+using namespace tbb;
 
 openvdb::util::CpuTimer t;
 
@@ -29,12 +32,15 @@ int main(){
   // Create an empty floating-point grid
   
   t.start();
+  tick_count t0 = tick_count::now();
   
   openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create(backgroundValue);
   CoordBBox indexBB(Coord(-20,-20,-20), Coord(140,60,60));
   f.create(grid, indexBB, 0.025f);
   
+  tick_count t1 = tick_count::now();
   t.stop();
+  cout << "time for action = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
   
   //  save 0 level set object -> .off
   

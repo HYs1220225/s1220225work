@@ -11,11 +11,17 @@
 #include "func.h"
 // #include "mechanical.h"
 // #include "boxes.h"
+#include "tbb/task_scheduler_init.h"
+#include "tbb/tick_count.h"
 
 using namespace std;
 using namespace openvdb;
+using namespace tbb;
 
 openvdb::util::CpuTimer T;
+tick_count T0;
+tick_count T1;
+
 using openvdb::tools::LevelSetFilter;
 
 void Func::computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
@@ -25,26 +31,35 @@ void Func::computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
-  
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
-  
+  T0 = tick_count::now();
+
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6/* 3 -> 6*/);
+  T1 = tick_count::now();
   T.stop();
+  
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
     iter.setValue(dist + offset);
   }
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
 
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_computeoffset.off", points, quads);
@@ -61,17 +76,25 @@ void Func::useoffset(FloatGrid::Ptr grid, float offset, std::string model){
   openvdb::FloatGrid::Ptr grid_offset = grid;  
   
   T.start();
+  T0 = tick_count::now();
   openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
   use.offset(offset);
   
+  T1 = tick_count::now();
   T.stop();
+  
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
   
+  T1 = tick_count::now();
   T.stop();
+  
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_useoffset.off", points, quads);
@@ -81,8 +104,11 @@ void Func::original(FloatGrid::Ptr grid, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   T.start();
+  T0 = tick_count::now();
   openvdb::tools::volumeToMesh(*grid, points, quads , 0.0);
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   // cout << "run test function" << endl;
   createOFFFile(model + ".off", points, quads);
 }
@@ -113,13 +139,17 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, std::string
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
+  T0 = tick_count::now();
   
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6 /* 3 -> 6 */);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
@@ -130,13 +160,18 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, std::string
     iter.setValue(dist + offset);
   }
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
 
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_Rounding_computeoffset.off", points, quads);
@@ -149,13 +184,17 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, std::strin
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
+  T0 = tick_count::now();
   
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6 /* 3 -> 6 */);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
@@ -166,13 +205,18 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, std::strin
     iter.setValue(dist - offset);
   }
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
 
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_Filleting_computeoffset.off", points, quads);
@@ -185,34 +229,43 @@ void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, std::strin
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
+  T0 = tick_count::now();
   
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 3);
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6 /* 3 -> 6 */);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
-    iter.setValue(dist - offset);
+    iter.setValue(dist + offset);
   }  
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
-    iter.setValue(dist + (2*offset));
+    iter.setValue(dist - (2*offset));
   }  
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
-    iter.setValue(dist - offset);
+    iter.setValue(dist + offset);
   }
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
 
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_Smoothing_computeoffset.off", points, quads);
@@ -228,18 +281,24 @@ void Func::Rounding_useoffset(FloatGrid::Ptr grid, float offset, std::string mod
   openvdb::FloatGrid::Ptr grid_offset = grid;  
   
   T.start();
+  T0 = tick_count::now();
   openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
   use.offset((-1)*offset);
   use.offset(offset);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_Rounding_useoffset.off", points, quads);
@@ -255,18 +314,24 @@ void Func::Filleting_useoffset(FloatGrid::Ptr grid, float offset, std::string mo
   openvdb::FloatGrid::Ptr grid_offset = grid;  
   
   T.start();
+  T0 = tick_count::now();
   openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
   use.offset(offset);
   use.offset((-1)*offset);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_Filleting_useoffset.off", points, quads);
@@ -282,19 +347,25 @@ void Func::Smoothing_useoffset(FloatGrid::Ptr grid, float offset, std::string mo
   openvdb::FloatGrid::Ptr grid_offset = grid;  
   
   T.start();
+  T0 = tick_count::now();
   openvdb::tools::LevelSetFilter<openvdb::FloatGrid> use(*grid_offset);
   //rounding and filleting
   use.offset((-1)*offset);
   use.offset(2*offset);
   use.offset((-1)*offset);
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
+  T0 = tick_count::now();
   
   openvdb::tools::volumeToMesh(*grid_offset, points, quads , 0.0);
   
+  T1 = tick_count::now();
   T.stop();
+  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_Smoothing_useoffset.off", points, quads);
