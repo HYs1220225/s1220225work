@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cmath>
 #include <openvdb/openvdb.h>
 #include <openvdb/tools/SignedFloodFill.h>
 #include <openvdb/tools/VolumeToMesh.h>
@@ -28,7 +29,7 @@ void Func::computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std:
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
-  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
+  float halfwidth = (2 * fabs(offset) / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
@@ -137,7 +138,7 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, float cells
   vector<Vec3s> points;
   vector<Vec4I> quads;
 
-  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
+  float halfwidth = (2 * fabs(offset) / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
@@ -186,7 +187,7 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, float cell
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
-  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
+  float halfwidth = (2 * fabs(offset) / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
@@ -235,13 +236,20 @@ void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, float cell
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
-  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
+  float halfwidth = (2 * fabs(offset) / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
+  // int threads = task_scheduler_init::default_num_threads();
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
   T0 = tick_count::now();
   
+  // for(int p = 1; p <= threads; ++p){
+  //   task_scheduler_init init(1);
+  //   tick_count start = tick_count::now();
   openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, halfwidth);
+  //   tick_count finish = tick_count::now();
+  //   cout << "time = " << (finish - start).seconds() << " with " << p << " threads" << endl;
+  // }
   
   T1 = tick_count::now();
   T.stop();
