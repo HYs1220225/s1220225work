@@ -24,16 +24,17 @@ tick_count T1;
 
 using openvdb::tools::LevelSetFilter;
 
-void Func::computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
+void Func::computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
+  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
   T0 = tick_count::now();
 
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6/* 3 -> 6*/);
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, halfwidth);
   T1 = tick_count::now();
   T.stop();
   
@@ -132,16 +133,17 @@ void Func::createOFFFile(string out_file_name, vector<Vec3s> points, vector<Vec4
 }
 
 
-void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
+void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
-  
+
+  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
   T0 = tick_count::now();
   
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6 /* 3 -> 6 */);
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, halfwidth);
   
   T1 = tick_count::now();
   T.stop();
@@ -154,7 +156,10 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, std::string
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
     iter.setValue(dist - offset);
-  }  
+  }
+  
+  grid_offset = openvdb::tools::levelSetRebuild(*grid_offset, 0.0, halfwidth);
+  
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
     iter.setValue(dist + offset);
@@ -177,16 +182,17 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, std::string
   createOFFFile(model + "_Rounding_computeoffset.off", points, quads);
 }
 
-void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
+void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
+  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
   T0 = tick_count::now();
   
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6 /* 3 -> 6 */);
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, halfwidth);
   
   T1 = tick_count::now();
   T.stop();
@@ -199,7 +205,10 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, std::strin
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
     iter.setValue(dist + offset);
-  }  
+  }
+  
+  grid_offset = openvdb::tools::levelSetRebuild(*grid_offset, 0.0, halfwidth);
+  
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
     iter.setValue(dist - offset);
@@ -222,16 +231,17 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, std::strin
   createOFFFile(model + "_Filleting_computeoffset.off", points, quads);
 }
 
-void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, std::string model){
+void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std::string model){
   vector<Vec3s> points;
   vector<Vec4I> quads;
   
+  float halfwidth = (2 * -offset / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
   T0 = tick_count::now();
   
-  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, 6 /* 3 -> 6 */);
+  openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, halfwidth);
   
   T1 = tick_count::now();
   T.stop();
@@ -243,15 +253,21 @@ void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, std::strin
   
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
-    iter.setValue(dist + offset);
-  }  
+    iter.setValue(dist - offset);
+  }
+  
+  grid_offset = openvdb::tools::levelSetRebuild(*grid_offset, 0.0, halfwidth);
+  
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
-    iter.setValue(dist - (2*offset));
-  }  
+    iter.setValue(dist + (2*offset));
+  }
+  
+  grid_offset = openvdb::tools::levelSetRebuild(*grid_offset, 0.0, halfwidth);
+
   for(openvdb::FloatGrid::ValueAllIter iter = grid_offset->beginValueAll(); iter; ++iter) {
     float dist = iter.getValue();
-    iter.setValue(dist + offset);
+    iter.setValue(dist - offset);
   }
   
   T1 = tick_count::now();

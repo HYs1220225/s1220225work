@@ -28,6 +28,7 @@ int main(){
 
   float backgroundValue = 1000.0f;
   float offset = -0.05; // -0.025 -> -0.05
+  float cellsize = 0.025;
   
   // Create an empty floating-point grid
   
@@ -36,7 +37,7 @@ int main(){
   
   openvdb::FloatGrid::Ptr grid = openvdb::FloatGrid::create(backgroundValue);
   CoordBBox indexBB(Coord(-20,-20,-20), Coord(140,60,60));
-  f.create(grid, indexBB, 0.025f);
+  f.create(grid, indexBB, cellsize/*0.025f*/);
   
   tick_count t1 = tick_count::now();
   t.stop();
@@ -66,25 +67,25 @@ int main(){
     f.original(grid, model);
     break;
   case 2:
-    f.computeoffset(grid, offset, model);
+    f.computeoffset(grid, offset, cellsize, model);
     break;
   case 3:
     f.useoffset(grid, offset, model);
     break;
   case 4:
-    f.Rounding_computeoffset(grid, offset, model);
+    f.Rounding_computeoffset(grid, offset, cellsize, model);
     break;
   case 5:
     f.Rounding_useoffset(grid, offset, model);
     break;
   case 6:
-    f.Filleting_computeoffset(grid, offset, model);
+    f.Filleting_computeoffset(grid, offset, cellsize, model);
     break;
   case 7:
     f.Filleting_useoffset(grid, offset, model);
     break;
   case 8:
-    f.Smoothing_computeoffset(grid, offset, model);
+    f.Smoothing_computeoffset(grid, offset, cellsize, model);
     break;
   case 9:
     f.Smoothing_useoffset(grid, offset, model);
