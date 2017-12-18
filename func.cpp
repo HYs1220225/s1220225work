@@ -39,7 +39,7 @@ void Func::computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std:
   T1 = tick_count::now();
   T.stop();
   
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (levelSetRebuild) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -52,7 +52,7 @@ void Func::computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std:
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (+- offset value) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
   T0 = tick_count::now();
@@ -61,7 +61,7 @@ void Func::computeoffset(FloatGrid::Ptr grid, float offset, float cellsize, std:
 
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_computeoffset.off", points, quads);
@@ -85,7 +85,7 @@ void Func::useoffset(FloatGrid::Ptr grid, float offset, std::string model){
   T1 = tick_count::now();
   T.stop();
   
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (offset()) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -96,7 +96,7 @@ void Func::useoffset(FloatGrid::Ptr grid, float offset, std::string model){
   T1 = tick_count::now();
   T.stop();
   
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_useoffset.off", points, quads);
@@ -110,7 +110,7 @@ void Func::original(FloatGrid::Ptr grid, std::string model){
   openvdb::tools::volumeToMesh(*grid, points, quads , 0.0);
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   // cout << "run test function" << endl;
   createOFFFile(model + ".off", points, quads);
 }
@@ -148,7 +148,7 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, float cells
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (levelSetRebuild) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -168,7 +168,7 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, float cells
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (+- offset value) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
   T0 = tick_count::now();
@@ -177,7 +177,7 @@ void Func::Rounding_computeoffset(FloatGrid::Ptr grid, float offset, float cells
 
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_Rounding_computeoffset.off", points, quads);
@@ -197,7 +197,7 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, float cell
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (levelSetRebuild) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -217,7 +217,7 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, float cell
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (+- offset value) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
   T0 = tick_count::now();
@@ -226,7 +226,7 @@ void Func::Filleting_computeoffset(FloatGrid::Ptr grid, float offset, float cell
 
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_Filleting_computeoffset.off", points, quads);
@@ -237,23 +237,16 @@ void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, float cell
   vector<Vec4I> quads;
   
   float halfwidth = (2 * fabs(offset) / cellsize) + 1; // (0.3 * 2 / 0.1) + 1 = 7
-  // int threads = task_scheduler_init::default_num_threads();
   openvdb::FloatGrid::Ptr grid_dist = grid;
   
   T.start();
   T0 = tick_count::now();
   
-  // for(int p = 1; p <= threads; ++p){
-  //   task_scheduler_init init(1);
-  //   tick_count start = tick_count::now();
   openvdb::FloatGrid::Ptr grid_offset = openvdb::tools::levelSetRebuild(*grid_dist, 0.0, halfwidth);
-  //   tick_count finish = tick_count::now();
-  //   cout << "time = " << (finish - start).seconds() << " with " << p << " threads" << endl;
-  // }
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (levelSetRebuild) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -280,7 +273,7 @@ void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, float cell
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (+- offset value) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   T.start();
   T0 = tick_count::now();
@@ -289,7 +282,7 @@ void Func::Smoothing_computeoffset(FloatGrid::Ptr grid, float offset, float cell
 
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
   
   /* save to off file */
   createOFFFile(model + "_Smoothing_computeoffset.off", points, quads);
@@ -312,7 +305,7 @@ void Func::Rounding_useoffset(FloatGrid::Ptr grid, float offset, std::string mod
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (offset()) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -322,7 +315,7 @@ void Func::Rounding_useoffset(FloatGrid::Ptr grid, float offset, std::string mod
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_Rounding_useoffset.off", points, quads);
@@ -345,7 +338,7 @@ void Func::Filleting_useoffset(FloatGrid::Ptr grid, float offset, std::string mo
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (offset()) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -355,7 +348,7 @@ void Func::Filleting_useoffset(FloatGrid::Ptr grid, float offset, std::string mo
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_Filleting_useoffset.off", points, quads);
@@ -379,7 +372,7 @@ void Func::Smoothing_useoffset(FloatGrid::Ptr grid, float offset, std::string mo
   use.offset((-1)*offset);
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (offset()) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   
   T.start();
@@ -389,7 +382,7 @@ void Func::Smoothing_useoffset(FloatGrid::Ptr grid, float offset, std::string mo
   
   T1 = tick_count::now();
   T.stop();
-  cout << "time for action = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (volumeToMesh) = " << (T1-T0).seconds() << " seconds (using tbb)" << endl;
 
   // save to off file
   createOFFFile(model + "_Smoothing_useoffset.off", points, quads);

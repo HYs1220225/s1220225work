@@ -24,6 +24,10 @@ int main(){
   string model("mechanical");
   int n;
   Fmecha f;
+  int nthreads = 1;      // task_scheduler_init::default_num_threads();
+  cout << "nthreads = "<< nthreads << endl;
+  task_scheduler_init schedulerInit((nthreads == 0) ? task_scheduler_init::automatic : nthreads);
+  
   openvdb::initialize();
 
   float backgroundValue = 1000.0f; // 1000.0f
@@ -41,7 +45,7 @@ int main(){
   
   tick_count t1 = tick_count::now();
   t.stop();
-  cout << "time for action = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
+  cout << "time for action (create grid) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
   
   
   //  save 0 level set object -> .off
@@ -65,31 +69,76 @@ int main(){
     cout << "quit" << endl;
     break;
   case 1:
+    t.start();
+    t0 = tick_count::now();
     f.original(grid, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 2:
+    t.start();
+    t0 = tick_count::now();
     f.computeoffset(grid, offset, cellsize, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 3:
+    t.start();
+    t0 = tick_count::now();
     f.useoffset(grid, offset, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 4:
+    t.start();
+    t0 = tick_count::now();
     f.Rounding_computeoffset(grid, offset, cellsize, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 5:
+    t.start();
+    t0 = tick_count::now();
     f.Rounding_useoffset(grid, offset, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 6:
+    t.start();
+    t0 = tick_count::now();
     f.Filleting_computeoffset(grid, offset, cellsize, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 7:
+    t.start();
+    t0 = tick_count::now();
     f.Filleting_useoffset(grid, offset, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 8:
+    t.start();
+    t0 = tick_count::now();
     f.Smoothing_computeoffset(grid, offset, cellsize, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   case 9:
+    t.start();
+    t0 = tick_count::now();
     f.Smoothing_useoffset(grid, offset, model);
+    t1 = tick_count::now();
+    t.stop();
+    cout << "time for action (TOTAL) = " << (t1-t0).seconds() << " seconds (using tbb)" << endl;
     break;
   default:
     cout << "Please input number 0 ~ 9" << endl;
