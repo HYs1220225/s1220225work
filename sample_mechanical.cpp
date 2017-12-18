@@ -24,7 +24,7 @@ int main(){
   string model("mechanical");
   int n;
   Fmecha f;
-  int nthreads = 1;      // task_scheduler_init::default_num_threads();
+  int nthreads = 4;      // task_scheduler_init::default_num_threads();
   cout << "nthreads = "<< nthreads << endl;
   task_scheduler_init schedulerInit((nthreads == 0) ? task_scheduler_init::automatic : nthreads);
   
