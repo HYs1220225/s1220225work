@@ -21,5 +21,13 @@ sample_box: sample_box.cpp
 	-Wl,-rpath,/usr/local/opt -L/usr/local/opt -lboost_iostreams -lboost_system  \
 	-Wl,-rpath,/usr/local -L/usr/local -ljemalloc
 
+sample_sphere: sample_sphere.cpp
+	@echo "Building $@ because of $(list_deps)"
+	$(CXX) $(CXXFLAGS) -o $@ sample_sphere.cpp func.cpp Fsphere.cpp \
+	-Wl,-rpath,/usr/local/lib -L/usr/local/lib -lopenvdb \
+	-ldl -lm -lz -Wl,-rpath,/usr/local -L/usr/local -lHalf \
+	-Wl,-rpath,/usr/local -L/usr/local -ltbb \
+	-Wl,-rpath,/usr/local/opt -L/usr/local/opt -lboost_iostreams -lboost_system  \
+	-Wl,-rpath,/usr/local -L/usr/local -ljemalloc
 clean:
 	rm -rf sample_box sample_mechanical
